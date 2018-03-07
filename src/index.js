@@ -135,13 +135,7 @@ function renderDataPoints(lipstickData, minMax) {
                 textAlign: 'center',
                 textVerticalAlign: 'middle',
                 fontSize: 12,
-                textFill: lipstickData[i].color,
-                textStroke: 'rgba(255, 255, 255, 0.3)',
-                textStrokeWidth: 1,
-                textShadowColor: 'rgba(255, 255, 255, 0.8)',
-                textShadowBlur: 4,
-                textShaderOffsetX: 1,
-                textShaderOffsetY: 1
+                textFill: 'rgba(255, 255, 255, 0.5)'
             },
             position: [pos[0], pos[1] + 16]
         });
@@ -234,6 +228,7 @@ function emphasis(group) {
     text.stopAnimation(true);
     text.animateTo({
         style: {
+            textFill: group.lipstick.color,
             fontSize: 16,
             textStrokeWidth: 3,
             textStroke: '#fff'
@@ -271,8 +266,9 @@ function relate(group) {
     text.stopAnimation(true);
     text.animateTo({
         style: {
+            textFill: group.lipstick.color,
             textStrokeWidth: 2,
-            textStroke: 'rgba(255, 255, 255, 0.6)'
+            textStroke: 'rgba(255, 255, 255, 0.75)'
         }
     }, 200, 0, 'bounceOut');
 }
@@ -304,8 +300,8 @@ function normal(groups) {
             style: {
                 fontSize: 12,
                 textStrokeWidth: 0,
-                textShadowColor: 'rgba(255, 255, 255, 0.8)',
-                textStroke: 'rgba(255, 255, 255, 0.6)'
+                textShadowBlur: 0,
+                textFill: 'rgba(255, 255, 255, 0.5)'
             }
         }, 200, 0, 'linear');
     }
@@ -324,8 +320,7 @@ function downplay(group) {
     text.stopAnimation(true);
     text.animateTo({
         style: {
-            opacity: 0,
-            textShadowBlur: 0
+            opacity: 0
         }
     }, 200, 0, 'linear');
 }
@@ -343,8 +338,7 @@ function undownplay(group) {
     text.stopAnimation(true);
     text.animateTo({
         style: {
-            opacity: 1,
-            textShadowBlur: 4
+            opacity: 1
         }
     }, 200, 0, 'linear');
 }
