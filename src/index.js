@@ -157,7 +157,7 @@ function renderDataPoints(lipstickData, minMax) {
 
     zr.on('mousemove', hover);
     zr.on('click', function () {
-        if (notNormalGroups) {
+        if (!lastEmphasisGroup) {
             normal(notNormalGroups);
             notNormalGroups = [];
         }
