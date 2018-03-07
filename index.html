@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>口红颜色可视化</title>
+
+    <style>
+        body, html {
+            padding: 0;
+            margin: 0;
+        }
+
+        canvas, #zr {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 10px 20px;
+        }
+
+        #info {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+        }
+
+        #link {
+            text-align: right;
+        }
+
+        #link a {
+            display: inline-block;
+            margin-right: 5px;
+            color: #DB9BAC;
+            font-size: 14px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 22px;
+            color: #D4597B;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 16px;
+            color: #555;
+        }
+
+        h3 {
+            margin: 3px 0;
+            font-size: 25px;
+            color: #D53D49;
+        }
+
+        .series-color {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid white;
+            margin-right: 3px;
+        }
+    </style>
+</head>
+<body onload="init()">
+    <canvas id="bg"></canvas>
+    <div id="zr"></div>
+
+    <div id="ui">
+        <h2>
+            <span id="brand-name"></span><span id="series-name"></span>
+        </h2>
+        <div id="series-colors"></div>
+        <h3 id="lipstick-info">
+            #<span id="lipstick-id"></span> <span id="lipstick-name"></span>
+        </h3>
+    </div>
+
+    <div id="info">
+        <h1>口红颜色可视化</h1>
+        <div id="link">
+            <a href="">GitHub</a>
+            <a href="">作者：@羡辙</a>
+        </div>
+    </div>
+
+    <!-- <script src="node_modules/tinycolor2/tinycolor.js"></script>
+    <script src="node_modules/zepto/dist/zepto.js"></script>
+    <script src="node_modules/zrender/dist/zrender.js"></script> -->
+
+    <script src="dist/lib/tinycolor-min.js"></script>
+    <script src="dist/lib/zepto.min.js"></script>
+    <script src="dist/lib/zrender.min.js"></script>
+
+    <!-- <script src="src/index.js"></script> -->
+    <script src="dist/index-min.js"></script>
+</body>
+</html>

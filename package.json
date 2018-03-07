@@ -1,0 +1,21 @@
+{
+  "name": "lipstick",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ovilia",
+  "license": "MIT",
+  "dependencies": {
+    "tinycolor2": "^1.4.1",
+    "zepto": "^1.2.0",
+    "zrender": "^4.0.3"
+  },
+  "devDependencies": {
+    "get-pixels": "^3.3.0",
+    "gulp": "^3.9.1",
+    "gulp-minify": "^2.1.0"
+  }
+}
