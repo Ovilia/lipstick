@@ -384,7 +384,9 @@ function updateUi(lipstick) {
     for (var i = 0; i < siblings.length; ++i) {
         var el = document.createElement('div');
         el.setAttribute('style', 'background-color:' + siblings[i].color);
-        el.setAttribute('class', 'series-color');
+
+        var className = siblings[i] === lipstick ? 'series-color active' : 'series-color';
+        el.setAttribute('class', className);
         seriesColors.appendChild(el);
     }
 }
