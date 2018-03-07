@@ -27,6 +27,7 @@ function init() {
 
         hover({ target: lipstickData[0].group.childAt(0) });
         updateUi(lipstickData[0]);
+        document.getElementById('ui').setAttribute('style', 'display:block');
     });
 }
 
@@ -163,113 +164,189 @@ function renderDataPoints(lipstickData, minMax) {
     });
 }
 
-var lastEmphasisEl = null;
+var lastEmphasisGroup = null;
 var notNormalGroups = [];
 function hover(el) {
-    if (lastEmphasisEl === el.target) {
-        return;
+    // unhover last group
+    if ((!el.target || el.target.parent !== lastEmphasisGroup) && notNormalGroups.length) {
+        normal(notNormalGroups);
+        notNormalGroups = [];
     }
 
     if (el.target) {
-        // unhover last group
-        if (notNormalGroups) {
-            normal(notNormalGroups);
-            notNormalGroups = [];
-        }
+        if (lastEmphasisGroup !== el.target.parent) {
+            // hover current
+            var group = el.target.parent;
+            emphasis(group);
+            notNormalGroups = [group];
 
-        // hover current
-        var group = el.target.parent;
-        emphasis(group);
-        notNormalGroups = [group];
+            var lipstick = group.lipstick;
+            var siblings = lipstick.series.lipsticks;
 
-        var lipstick = group.lipstick;
-        var siblings = lipstick.series.lipsticks;
-        for (var i = 0; i < siblings.length; ++i) {
-            if (siblings[i] !== lipstick) {
-                relate(siblings[i].group);
-                notNormalGroups.push(siblings[i].group);
+            for (var i = 0; i < lipstickData.length; ++i) {
+                var l = lipstickData[i];
+                if (l !== lipstick) {
+                    if (siblings.indexOf(l) > -1) {
+                        relate(l.group);
+                        notNormalGroups.push(l.group);
+                    }
+                    else {
+                        downplay(l.group);
+                    }
+                }
             }
+
+            lastEmphasisGroup = el.target.parent;
         }
     }
-
-    lastEmphasisEl = el.target;
+    else if (lastEmphasisGroup) {
+        for (var i = 0; i < lipstickData.length; ++i) {
+            undownplay(lipstickData[i].group);
+        }
+        lastEmphasisGroup = null;
+    }
 }
 
 function emphasis(group) {
+    undownplay(group);
+
     var point = group.childAt(0);
-    point.attr('style', {
-        lineWidth: 3,
-        stroke: '#fff',
-        shadowBlur: 20,
-        shadowColor: 'rgba(0, 0, 0, 0.4)'
-    });
     point.attr('z', 11);
-    point.attr('shape', {
-        r: 30
-    });
+    point.stopAnimation(true);
+    point.animateTo({
+        shape: {
+            r: 30
+        },
+        style: {
+            lineWidth: 3,
+            stroke: '#fff',
+            shadowBlur: 20,
+            shadowColor: 'rgba(0, 0, 0, 0.4)'
+        }
+    }, 200, 0, 'bounceOut');
 
     var text = group.childAt(1);
+    text.attr('z', 10);
     text.attr('style', {
         text: '#' + group.lipstick.id + ' ' + group.lipstick.name,
-        fontSize: 16,
-        textStrokeWidth: 3,
-        textStroke: '#fff',
         textPadding: [62, 0, 0, 0]
     });
-    text.attr('z', 10);
+    text.stopAnimation(true);
+    text.animateTo({
+        style: {
+            fontSize: 16,
+            textStrokeWidth: 3,
+            textStroke: '#fff'
+        }
+    }, 200, 0, 'bounceOut');
 
     updateUi(group.lipstick);
 }
 
 function relate(group) {
+    undownplay(group);
+
     var point = group.childAt(0);
+    point.stopAnimation(true);
     point.attr('style', {
-        lineWidth: 2,
-        shadowBlur: 8,
-        shadowColor: 'rgba(0, 0, 0, 0.2)'
+        lineWidth: 2
     });
     point.attr('z', 9);
     point.attr('shape', {
         r: 10
     });
+    point.animateTo({
+        style: {
+            shadowBlur: 8,
+            shadowColor: 'rgba(0, 0, 0, 0.2)'
+        }
+    }, 200, 0, 'bounceOut');
 
     var text = group.childAt(1);
     text.attr('style', {
         text: '#' + group.lipstick.id + ' ' + group.lipstick.name,
-        textStroke: 'rgba(255, 255, 255, 0.5)',
-        textStrokeWidth: 2,
         textPadding: [12, 0, 0, 0]
     });
     text.attr('z', 8);
+    text.stopAnimation(true);
+    text.animateTo({
+        style: {
+            textStrokeWidth: 2,
+            textStroke: 'rgba(255, 255, 255, 0.6)'
+        }
+    }, 200, 0, 'bounceOut');
 }
 
 function normal(groups) {
     for (var i = 0; i < groups.length; ++i) {
         var point = groups[i].childAt(0);
-        point.attr('style', {
-            stroke: 'rgba(255, 255, 255, 0.8)',
-            lineWidth: 1,
-            shadowBlur: 0
-        });
         point.attr('z', 1);
-        point.attr('shape', {
-            r: 5
-        });
+        point.stopAnimation(true);
+        point.animateTo({
+            shape: {
+                r: 5
+            },
+            style: {
+                stroke: 'rgba(255, 255, 255, 0.8)',
+                lineWidth: 1,
+                shadowBlur: 0
+            }
+        }, 200, 0, 'linear');
 
         var text = groups[i].childAt(1);
+        text.stopAnimation(true);
         text.attr('style', {
             text: groups[i].lipstick.name,
-            fontSize: 12,
-            textStrokeWidth: 0,
-            textShadowColor: 'rgba(255, 255, 255, 0.8)',
             textPadding: 0
         });
         text.attr('z', 0);
+        text.animateTo({
+            style: {
+                fontSize: 12,
+                textStrokeWidth: 0,
+                textShadowColor: 'rgba(255, 255, 255, 0.8)',
+                textStroke: 'rgba(255, 255, 255, 0.6)'
+            }
+        }, 200, 0, 'linear');
     }
 }
 
-function getSeriesGroup(group) {
+function downplay(group) {
+    var point = group.childAt(0);
+    point.stopAnimation(true);
+    point.animateTo({
+        style: {
+            opacity: 0.6
+        }
+    }, 200, 0, 'linear');
 
+    var text = group.childAt(1);
+    text.stopAnimation(true);
+    text.animateTo({
+        style: {
+            opacity: 0,
+            textShadowBlur: 0
+        }
+    }, 200, 0, 'linear');
+}
+
+function undownplay(group) {
+    var point = group.childAt(0);
+    point.stopAnimation(true);
+    point.animateTo({
+        style: {
+            opacity: 1
+        }
+    }, 200, 0, 'linear');
+
+    var text = group.childAt(1);
+    text.stopAnimation(true);
+    text.animateTo({
+        style: {
+            opacity: 1,
+            textShadowBlur: 4
+        }
+    }, 200, 0, 'linear');
 }
 
 function getDataCoord(data, minMax) {
