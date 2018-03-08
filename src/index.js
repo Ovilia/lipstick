@@ -6,8 +6,8 @@ var height = 0;
 var lipstickData = null;
 
 function init() {
-    width = window.innerWidth * bgDpi;
-    height = window.innerHeight * bgDpi;
+    width = Math.floor(window.innerWidth * bgDpi);
+    height = Math.floor(window.innerHeight * bgDpi);
 
     var bgDom = document.getElementById('bg');
     bgDom.setAttribute('width', width);
