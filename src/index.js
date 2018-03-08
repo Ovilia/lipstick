@@ -18,7 +18,7 @@ function init() {
     zrDom.setAttribute('height', window.innerHeight * zrDpi);
     zr = zrender.init(zrDom);
 
-    $.getJSON('lipstick.json', function (data) {
+    $.getJSON('dist/lipstick.json', function (data) {
         updateLipstickData(data);
 
         var minMax = getMinMax(lipstickData);
