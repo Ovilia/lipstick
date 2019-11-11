@@ -28,6 +28,35 @@
             padding: 10px 20px;
         }
 
+        /* 搜索框位置 */
+        #search {
+            position: absolute;
+            right: 100px;
+            top:   20px;
+        }
+        
+        .serachbar {background: #F9F0DA;}
+        .serachbar input {
+            border: 2px solid #c5464a;
+            border-radius: 5px;
+            background: transparent;
+            top: 0;
+            right: 0;
+            font-size: 16px;
+        }
+        .serachbar button {
+            background: #c5464a;
+            border-radius: 0 5px 5px 0;
+            width: 60px;
+            top: 0;
+            right: 0;
+        }
+        .serachbar button:before {
+            content: "搜索";
+            font-size: 16px;
+            color: #F9F0DA;
+        }
+
         #info {
             position: absolute;
             right: 10px;
@@ -91,6 +120,15 @@
         </h3>
     </div>
 
+    <!-- 给出颜色值搜索框, 搜索 给出一个标识点, 便于查找位置 -->
+    <div id="search" class = "serachbar">
+        当前口红颜色值: <span id="lipstick-hex"></span>
+        <form method="GET" id = "search_form">
+            <input type="text" name="color" id="color_" placeholder="请输入您要的颜色 #HEX 值..." >
+            <button type="submit"></button>
+        </form>
+    </div>
+
     <div id="info">
         <h1>口红颜色可视化</h1>
         <div id="link">
@@ -107,8 +145,31 @@
     <script src="dist/lib/zepto.min.js"></script>
     <script src="dist/lib/zrender.min.js"></script>
 
-    <!-- <script src="src/index.js"></script> -->
-    <script src="dist/index-min.js"></script>
+    <script src="src/index.js"></script>
+    <!-- <script src="dist/index-min.js"></script> -->
+
+    <script>
+    // 获取参数 标识出来需要查找的位置
+    function getQueryVariable(variable)
+    {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+                var pair = vars[i].split("=");
+                if(pair[0] == variable){return pair[1];}
+        }
+        return(false);
+    }
+
+    // 获取参数之后 如果有效 标识出来颜色值
+    let color = getQueryVariable("color");
+    if(color != false) {
+        showSearchResult("#"+color);
+    }
+
+    </script>
+
+        
 
     <script>
     var _hmt = _hmt || [];

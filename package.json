@@ -4,18 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "anywhere 2333"
   },
   "author": "Ovilia",
   "license": "MIT",
   "dependencies": {
+    "anywhere": "^1.5.0",
     "tinycolor2": "^1.4.1",
     "zepto": "^1.2.0",
     "zrender": "^4.0.3"
   },
   "devDependencies": {
     "get-pixels": "^3.3.0",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.2",
     "gulp-jsonminify": "^1.1.0",
     "gulp-minify": "^2.1.0"
   }

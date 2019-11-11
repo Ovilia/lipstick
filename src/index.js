@@ -5,6 +5,8 @@ var width = 0;
 var height = 0;
 var lipstickData = null;
 
+var search_color = null;    ///< 标识搜索得到的结果 如果没有搜索 结果为-1  有结果就显示有结果的值
+
 function init() {
     width = Math.floor(window.innerWidth * bgDpi);
     height = Math.floor(window.innerHeight * bgDpi);
@@ -22,13 +24,28 @@ function init() {
         updateLipstickData(data);
 
         var minMax = getMinMax(lipstickData);
+
+        g_minMax = minMax;
         renderBackground(bgDom, minMax);
         renderDataPoints(lipstickData, minMax);
 
-        hover({ target: lipstickData[0].group.childAt(0) });
-        updateUi(lipstickData[0]);
+        var id_ = 0;
+        // 如果没有赋值 表示是标识是直接通过链接直接进入的
+        // 如果有值, 则搜索最近的颜色显示
+        if(search_color == null) {
+            // id 不连续 导致随机可能有些值不存在
+            // id_ = Math.ceil(Math.random()*lipstickData.length);
+            id_ = 10
+
+        } else {
+            id_ = searchLipstickData(search_color,lipstickData);
+        }
+
+        showPageByColorID(id_);
+
         document.getElementById('ui').setAttribute('style', 'display:block');
     });
+
 }
 
 function updateLipstickData(rawData) {
@@ -46,6 +63,7 @@ function updateLipstickData(rawData) {
     }
 }
 
+// get json data min and Max data range to show
 function getMinMax(lipstickData) {
     var minHue = Number.MAX_VALUE;
     var maxHue = Number.MIN_VALUE;
@@ -364,16 +382,110 @@ function encodeHue(hue) {
     }
 }
 
+// 计算一个颜色的座标值
+function getColorCoord(color,minMax) {
+    var hsl = colorHexToHsl(color);
+    return getHslCoord(hsl,minMax);
+}
+// #hex  值转变为 hsl 值
+function colorHexToHsl(color) {
+    color = color.charAt(0) == "#" ?color:("#"+color); ///< 如果第一位是# 就不加了
+    var hsl = tinycolor(color).toHsl();
+    hsl.l *= 100;
+    return hsl;
+}
+// 根据 hsl 获取座标值
+function getHslCoord(hsl,minMax) {
+    var hue = encodeHue(hsl.h);
+    var light = hsl.l;
+    return {
+        x: (hue - minMax.minHue) * width / (minMax.maxHue - minMax.minHue) / bgDpi,
+        y: height / bgDpi - (light - minMax.minLight) * height / (minMax.maxLight - minMax.minLight) / bgDpi
+    };
+
+}
+
+// 返回最接近的颜色值 // 计算 RGB 最接近的值 
+// 如果存在当前值 直接返回当前值
+function searchLipstickData(color,lipstickData) {
+    var min_error = Number.MAX_VALUE;   ///< 记录最小误差
+    var min_error_l = 0;   ///< 记录最小误差 出现的位置
+    
+    for(var i=0; i<lipstickData.length; i++) {
+        var e = calcColorError(color,lipstickData[i].color);
+
+        if(e == 0)
+            return lipstickData[i].id;
+
+        if(e < min_error) {
+            min_error = e;
+            min_error_l = lipstickData[i].id;
+        }
+    }
+    return min_error_l;
+}
+
+// 给定两个颜色值 计算差值 均是正值 如果一致 返回 0
+// 颜色为 #FFFFFF  六位hex 大写字母
+// 计算 6位hex 值的依次三个值 的颜色差的绝对值
+function calcColorError(color1, color2) {
+    color1 = tinycolor(color1).toRgb();
+    color2 = tinycolor(color2).toRgb();
+    return Math.abs(color1.r-color2.r) + 
+           Math.abs(color1.g-color2.g) + 
+           Math.abs(color1.b-color2.b);
+}
+
+// 根据参数 更新页面显示  // ID 不是序号
+function showPageByColorID(id)
+{
+    // 由于是返回的值 id 一定有效, 无序验证
+    for(var i=0;i<lipstickData.length;i++)
+    {
+        if(lipstickData[i].id == id)
+        {
+            hover({ target: lipstickData[i].group.childAt(0) });
+            updateUi(lipstickData[i]);
+            return ;
+        }
+    }
+}
+
+// 将结果显示在界面上 // 正则验证颜色值
+//  返回搜索结果最贴近的颜色的
+// 点击左上角系列下面的颜色触发搜索
+function showSearchResult(color) {
+    // init(); // 初始话 更新数据
+    color = color.toUpperCase();
+    console.log("Serach color:" + color);
+    var pattern = /^#[0-9a-fA-F]{6}$/;      // 验证 #开头 6位hex  值
+    if(color.match(pattern) == null) {
+        alert("Search color is invalided" + color);
+        // console.log("Search color is invalided:" + color);
+    } else {
+
+        // 如果已经有值 标识 点击过了 或者搜索过了
+        if(search_color != null) {
+            var id = searchLipstickData(color,lipstickData);
+            showPageByColorID(id)
+        }
+
+        search_color = color;   ///< 每次搜索都进行 赋值  根据赋值情况处理后续显示
+    }
+
+}
+
 function updateUi(lipstick) {
     document.getElementById('brand-name').innerText = lipstick.brand.name;
     document.getElementById('series-name').innerText = lipstick.series.name;
     document.getElementById('lipstick-id').innerText = lipstick.id;
     document.getElementById('lipstick-name').innerText = lipstick.name;
+    document.getElementById('lipstick-hex').innerText = lipstick.color;
     document.getElementById('lipstick-info').setAttribute('style', 'color:' + lipstick.color);
 
     var seriesColors = document.getElementById('series-colors');
     seriesColors.innerText = '';
-
+    // 跟新左上角的系列 颜色和 当前颜色
     var siblings = lipstick.series.lipsticks;
     for (var i = 0; i < siblings.length; ++i) {
         var el = document.createElement('div');
@@ -381,6 +493,11 @@ function updateUi(lipstick) {
 
         var className = siblings[i] === lipstick ? 'series-color active' : 'series-color';
         el.setAttribute('class', className);
+        // 设置点击链接
+        // el.setAttribute('onclick',
+        // "window.location.href=\'http://"+window.location.host + window.location.pathname +"?color=" +siblings[i].color.substr(1) + "\';return false");
+
+        el.setAttribute('onclick','showSearchResult(\"'+siblings[i].color+'\")');
         seriesColors.appendChild(el);
     }
 }
