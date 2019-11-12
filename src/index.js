@@ -29,19 +29,19 @@ function init() {
         renderBackground(bgDom, minMax);
         renderDataPoints(lipstickData, minMax);
 
-        var id_ = 0;
+        var idx_ = 0;
         // 如果没有赋值 表示是标识是直接通过链接直接进入的
         // 如果有值, 则搜索最近的颜色显示
         if(search_color == null) {
             // id 不连续 导致随机可能有些值不存在
-            // id_ = Math.ceil(Math.random()*lipstickData.length);
-            id_ = 10
+            // idx_ = Math.ceil(Math.random()*lipstickData.length);
+            idx_ = 10
 
         } else {
-            id_ = searchLipstickData(search_color,lipstickData);
+            idx_ = searchLipstickData(search_color,lipstickData);
         }
 
-        showPageByColorID(id_);
+        showPageByColorID(idx_);
 
         document.getElementById('ui').setAttribute('style', 'display:block');
     });
@@ -407,19 +407,20 @@ function getHslCoord(hsl,minMax) {
 
 // 返回最接近的颜色值 // 计算 RGB 最接近的值 
 // 如果存在当前值 直接返回当前值
+// 返回在数组中的  索引值 
 function searchLipstickData(color,lipstickData) {
     var min_error = Number.MAX_VALUE;   ///< 记录最小误差
-    var min_error_l = 0;   ///< 记录最小误差 出现的位置
+    var min_error_l = 0;   ///< 记录最小误差 出现的位置 // 下标
     
     for(var i=0; i<lipstickData.length; i++) {
         var e = calcColorError(color,lipstickData[i].color);
 
         if(e == 0)
-            return lipstickData[i].id;
+            return i ; // lipstickData[i].id;
 
         if(e < min_error) {
             min_error = e;
-            min_error_l = lipstickData[i].id;
+            min_error_l =  i;  // lipstickData[i].id;
         }
     }
     return min_error_l;
@@ -436,19 +437,26 @@ function calcColorError(color1, color2) {
            Math.abs(color1.b-color2.b);
 }
 
-// 根据参数 更新页面显示  // ID 不是序号
-function showPageByColorID(id)
+// 根据参数 更新页面显示  // ID 不是序号 
+// id可能重复 这里考虑使用在 lipstickData 的下标
+function showPageByColorID(idx)
 {
-    // 由于是返回的值 id 一定有效, 无序验证
-    for(var i=0;i<lipstickData.length;i++)
-    {
-        if(lipstickData[i].id == id)
-        {
-            hover({ target: lipstickData[i].group.childAt(0) });
-            updateUi(lipstickData[i]);
-            return ;
-        }
-    }
+    // 下标界限
+    if(idx <0 || idx >= lipstickData.length)
+        idx  = 0
+
+    hover({ target: lipstickData[idx].group.childAt(0) });
+    updateUi(lipstickData[idx]);
+
+    // for(var i=0;i<lipstickData.length;i++)
+    // {
+    //     if(lipstickData[i].id == id)
+    //     {
+    //         hover({ target: lipstickData[i].group.childAt(0) });
+    //         updateUi(lipstickData[i]);
+    //         return ;
+    //     }
+    // }
 }
 
 // 将结果显示在界面上 // 正则验证颜色值
